@@ -1,8 +1,8 @@
 # ElevenLabs Laravel Package
 
 <p align="center">
-    <a href="https://github.com/samandar/laravel-elevenlabs/actions">
-        <img src="https://img.shields.io/github/actions/workflow/status/samandar/laravel-elevenlabs/tests.yml?branch=main&style=flat-square&logo=github" alt="Tests">
+    <a href="https://github.com/abdu11aev-samandar/laravel-elevenlabs/actions">
+        <img src="https://img.shields.io/github/actions/workflow/status/abdu11aev-samandar/laravel-elevenlabs/tests.yml?branch=main&style=flat-square&logo=github" alt="Tests">
     </a>
     <a href="https://packagist.org/packages/samandar/laravel-elevenlabs">
         <img src="https://img.shields.io/packagist/v/samandar/laravel-elevenlabs.svg?style=flat-square&logo=packagist" alt="Latest Version">
@@ -10,8 +10,8 @@
     <a href="https://packagist.org/packages/samandar/laravel-elevenlabs">
         <img src="https://img.shields.io/packagist/dt/samandar/laravel-elevenlabs.svg?style=flat-square&logo=packagist" alt="Total Downloads">
     </a>
-    <a href="https://github.com/samandar/laravel-elevenlabs/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/samandar/laravel-elevenlabs?style=flat-square" alt="License">
+    <a href="https://github.com/abdu11aev-samandar/laravel-elevenlabs/blob/main/LICENSE">
+        <img src="https://img.shields.io/github/license/abdu11aev-samandar/laravel-elevenlabs?style=flat-square" alt="License">
     </a>
     <a href="https://php.net">
         <img src="https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=flat-square&logo=php" alt="PHP Version">
@@ -672,13 +672,13 @@ If you discover any security related issues, please email **xkas2001@gmail.com**
 
 ### 📋 Support Channels
 
-- **GitHub Issues**: [Report bugs and feature requests](https://github.com/samandar/laravel-elevenlabs/issues)
+- **GitHub Issues**: [Report bugs and feature requests](https://github.com/abdu11aev-samandar/laravel-elevenlabs/issues)
 - **Email**: xkas2001@gmail.com for security issues
 - **Documentation**: Comprehensive guides available in this README
 
 ## Credits
 
-- **[Abdullaev Samandar](https://github.com/samandar)** - Package author and maintainer
+- **[Abdullaev Samandar](https://github.com/abdu11aev-samandar)** - Package author and maintainer
 - **[ElevenLabs](https://elevenlabs.io)** - For providing the amazing TTS API
 - **Laravel Community** - For the inspiration and support
 - **All Contributors** - Thank you for your valuable contributions!
@@ -702,5 +702,5 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 </p>
 
 <p align="center">
-    <em>Made with ❤️ by <a href="https://github.com/samandar">Abdullaev Samandar</a></em>
+<em>Made with ❤️ by <a href="https://github.com/abdu11aev-samandar">Abdullaev Samandar</a></em>
 </p>
