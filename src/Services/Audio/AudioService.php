@@ -9,6 +9,80 @@ use Illuminate\Support\Facades\Log;
 class AudioService extends BaseElevenLabsService
 {
     /**
+     * Create Audio Native project (player) via multipart form
+     * Docs: POST /v1/audio-native
+     */
+    public function createAudioNativeProject(
+        string $name,
+        array $options = [],
+        UploadedFile|string|null $file = null
+    ): array {
+        $multipart = [
+            ['name' = 'name', 'contents' = $name],
+        ];
+
+        // Map known optional fields
+        $fields = [
+            'image', 'author', 'title', 'small', 'text_color', 'background_color',
+            'sessionization', 'voice_id', 'model_id', 'auto_convert'
+        ];
+        foreach ($fields as $key) {
+            if (array_key_exists($key, $options) && $options[$key] !== null) {
+                $val = $options[$key];
+                if (is_bool($val)) { $val = $val ? 'true' : 'false'; }
+                $multipart[] = ['name' = $key, 'contents' = (string) $val];
+            }
+        }
+
+        if ($file) {
+            if ($file instanceof UploadedFile) {
+                $multipart[] = [
+                    'name' = 'file',
+                    'contents' = fopen($file->getPathname(), 'r'),
+                    'filename' = $file->getClientOriginalName(),
+                ];
+            } else {
+                $multipart[] = [
+                    'name' = 'file',
+                    'contents' = fopen($file, 'r'),
+                    'filename' = basename($file),
+                ];
+            }
+        }
+
+        $result = $this->post('/audio-native', [
+            'multipart' => $multipart,
+            'headers' => ['xi-api-key' => $this->apiKey]
+        ]);
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'project' => $result['data'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get Audio Native project settings
+     * Docs: GET /v1/audio-native/{projectId}/settings
+     */
+    public function getAudioNativeSettings(string $projectId): array
+    {
+        $result = $this->get("/audio-native/{$projectId}/settings");
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'settings' => $result['data'],
+            ];
+        }
+
+        return $result;
+    }
+    /**
      * Convert text to speech
      */
     public function textToSpeech(
