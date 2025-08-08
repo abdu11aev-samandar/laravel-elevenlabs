@@ -64,8 +64,11 @@ class NewEndpointsIntegrationTest extends TestCase
     public function testCompleteAudioProcessingWorkflow()
     {
         // Step 1: Audio Isolation
+        // Create temporary file to satisfy fopen
+        $tempPath = tempnam(sys_get_temp_dir(), 'noisy_');
+        file_put_contents($tempPath, 'fake-wav-data');
         $mockFile = Mockery::mock(UploadedFile::class);
-        $mockFile->shouldReceive('getPathname')->andReturn('/tmp/noisy_audio.wav');
+        $mockFile->shouldReceive('getPathname')->andReturn($tempPath);
         $mockFile->shouldReceive('getClientOriginalName')->andReturn('noisy_audio.wav');
 
         $isolationResponse = new Response(200, ['Content-Type' => 'audio/wav'], 'clean-audio-data');
@@ -109,7 +112,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/user/subscription', Mockery::any())
+            ->with('/user/subscription')
             ->andReturn($subscriptionResponse);
 
         // Step 2: Create an AI agent
@@ -140,7 +143,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with(Mockery::pattern('/\/convai\/conversations\?/'), Mockery::any())
+            ->with(Mockery::pattern('/\/convai\/conversations\?/'))
             ->andReturn($conversationsResponse);
 
         // Step 4: Get specific conversation details
@@ -155,7 +158,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/conversations/conv-1', Mockery::any())
+            ->with('/convai/conversations/conv-1')
             ->andReturn($conversationResponse);
 
         // Step 5: Download conversation audio
@@ -219,7 +222,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/batch-calling/batch-456', Mockery::any())
+            ->with('/convai/batch-calling/batch-456')
             ->andReturn($statusResponse);
 
         // Execute batch workflow
@@ -252,7 +255,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/user/subscription', Mockery::any())
+            ->with('/user/subscription')
             ->andReturn($subscriptionResponse);
 
         // Step 2: Create voice previews
@@ -297,8 +300,10 @@ class NewEndpointsIntegrationTest extends TestCase
     public function testErrorHandlingAcrossNewEndpoints()
     {
         // Test audio isolation error
+        $tempErrPath = tempnam(sys_get_temp_dir(), 'aud_');
+        file_put_contents($tempErrPath, 'fake-audio');
         $mockFile = Mockery::mock(UploadedFile::class);
-        $mockFile->shouldReceive('getPathname')->andReturn('/tmp/test.wav');
+        $mockFile->shouldReceive('getPathname')->andReturn($tempErrPath);
         $mockFile->shouldReceive('getClientOriginalName')->andReturn('test.wav');
 
         $this->mockClient
@@ -332,7 +337,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/conversations/invalid-id', Mockery::any())
+            ->with('/convai/conversations/invalid-id')
             ->andThrow(new \GuzzleHttp\Exception\RequestException(
                 'Conversation not found', 
                 Mockery::mock('Psr\Http\Message\RequestInterface')
@@ -370,7 +375,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/agents/agent-123/conversations', Mockery::any())
+            ->with('/convai/agents/agent-123/conversations')
             ->andReturn($conversationsResponse);
 
         $conversations = $this->service->ai()->getAgentConversations('agent-123');

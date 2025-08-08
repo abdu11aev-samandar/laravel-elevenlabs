@@ -16,19 +16,21 @@ class AudioService extends BaseElevenLabsService
         string $voiceId = '21m00Tcm4TlvDq8ikWAM', 
         array $voiceSettings = []
     ): array {
-        $defaultVoiceSettings = [
+        $defaultVoiceSettings = config('elevenlabs.default_voice_settings', [
             'stability' => 0.5,
             'similarity_boost' => 0.5,
             'style' => 0.5,
             'use_speaker_boost' => true,
-        ];
+        ]);
 
         $voiceSettings = array_merge($defaultVoiceSettings, $voiceSettings);
+
+        $modelId = config('elevenlabs.default_model', 'eleven_multilingual_v2');
 
         $result = $this->postBinary("/text-to-speech/{$voiceId}", [
             'json' => [
                 'text' => $text,
-                'model_id' => 'eleven_multilingual_v2',
+                'model_id' => $modelId,
                 'voice_settings' => $voiceSettings,
             ],
         ]);
@@ -140,23 +142,25 @@ class AudioService extends BaseElevenLabsService
     public function streamTextToSpeech(
         string $text,
         string $voiceId = '21m00Tcm4TlvDq8ikWAM',
-        string $modelId = 'eleven_multilingual_v2',
+        string $modelId = null,
         array $voiceSettings = []
     ): \Generator {
-        $defaultVoiceSettings = [
+        $defaultVoiceSettings = config('elevenlabs.default_voice_settings', [
             'stability' => 0.5,
             'similarity_boost' => 0.5,
             'style' => 0.5,
             'use_speaker_boost' => true,
-        ];
+        ]);
 
         $voiceSettings = array_merge($defaultVoiceSettings, $voiceSettings);
+
+        $effectiveModelId = $modelId ?? config('elevenlabs.default_model', 'eleven_multilingual_v2');
 
         try {
             $response = $this->client->post("/text-to-speech/{$voiceId}/stream", [
                 'json' => [
                     'text' => $text,
-                    'model_id' => $modelId,
+                    'model_id' => $effectiveModelId,
                     'voice_settings' => $voiceSettings,
                 ],
                 'stream' => true

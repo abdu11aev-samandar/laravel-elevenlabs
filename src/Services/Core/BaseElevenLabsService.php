@@ -15,13 +15,14 @@ abstract class BaseElevenLabsService
     public function __construct(string $apiKey)
     {
         $this->apiKey = $apiKey;
+        $this->baseUrl = config('elevenlabs.base_uri', $this->baseUrl);
         $this->client = new Client([
             'base_uri' => $this->baseUrl,
+            // Content-Type ni global emas, har bir so'rov turiga qarab Guzzle o'zi belgilaydi
             'headers' => [
-                'Content-Type' => 'application/json',
                 'xi-api-key' => $this->apiKey,
             ],
-            'timeout' => 30,
+            'timeout' => (int) config('elevenlabs.timeout', 30),
         ]);
     }
 
