@@ -8,6 +8,73 @@ use Illuminate\Http\UploadedFile;
 class StudioService extends BaseElevenLabsService
 {
     /**
+     * Get chapter details
+     */
+    public function getChapter(string $projectId, string $chapterId): array
+    {
+        $result = $this->get("/studio/projects/{$projectId}/chapters/{$chapterId}");
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'chapter' => $result['data'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * List chapter snapshots
+     */
+    public function listChapterSnapshots(string $projectId, string $chapterId): array
+    {
+        $result = $this->get("/studio/projects/{$projectId}/chapters/{$chapterId}/snapshots");
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'snapshots' => $result['data'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get specific chapter snapshot
+     */
+    public function getChapterSnapshot(string $projectId, string $chapterId, string $chapterSnapshotId): array
+    {
+        $result = $this->get("/studio/projects/{$projectId}/chapters/{$chapterId}/snapshots/{$chapterSnapshotId}");
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'chapter_snapshot' => $result['data'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get project snapshot
+     */
+    public function getProjectSnapshot(string $projectId, string $projectSnapshotId): array
+    {
+        $result = $this->get("/studio/projects/{$projectId}/snapshots/{$projectSnapshotId}");
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'project_snapshot' => $result['data'],
+            ];
+        }
+
+        return $result;
+    }
+    /**
      * Get studio projects
      */
     public function getStudioProjects(): array
@@ -206,6 +273,24 @@ class StudioService extends BaseElevenLabsService
                 'success' => true,
                 'audio' => $result['data'],
                 'content_type' => $result['content_type'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get dubbing transcript (SRT/WEBVTT)
+     */
+    public function getDubbingTranscript(string $dubbingId, string $formatType = 'srt'): array
+    {
+        $endpoint = "/dubbing/{$dubbingId}/transcript?" . http_build_query(['format_type' => $formatType]);
+        $result = $this->get($endpoint);
+
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'transcript' => $result['data'],
             ];
         }
 
