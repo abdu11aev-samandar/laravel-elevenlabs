@@ -7,6 +7,27 @@ use Samandar\LaravelElevenLabs\Services\Core\BaseElevenLabsService;
 class AIService extends BaseElevenLabsService
 {
     /**
+     * Get signed URL token for starting websocket conversation
+     */
+    public function getSignedUrl(string $agentId): array
+    {
+        $endpoint = '/convai/conversations/get-signed-url?'.http_build_query(['agent_id' => $agentId]);
+        return $this->get($endpoint);
+    }
+
+    /**
+     * Get agent widget configuration
+     */
+    public function getAgentWidgetConfig(string $agentId, ?string $conversationSignature = null): array
+    {
+        $query = [];
+        if ($conversationSignature) {
+            $query['conversation_signature'] = $conversationSignature;
+        }
+        $endpoint = "/convai/agents/{$agentId}/widget" . (!empty($query) ? ('?'.http_build_query($query)) : '');
+        return $this->get($endpoint);
+    }
+    /**
      * Get conversational AI settings
      */
     public function getConversationalAISettings(): array
@@ -97,6 +118,34 @@ class AIService extends BaseElevenLabsService
     public function deleteKnowledgeBase(string $documentationId): array
     {
         return $this->delete("/convai/knowledge-base/{$documentationId}");
+    }
+
+    /**
+     * Knowledge Base Documents: upload from file
+     */
+    public function createKnowledgeBaseDocumentFromFile(array $multipart): array
+    {
+        // $multipart e.g. [['name' => 'file', 'contents' => fopen(...), 'filename' => '...'], ...]
+        return $this->post('/convai/knowledge-base/documents/create-from-file', [
+            'multipart' => $multipart,
+            'headers' => ['xi-api-key' => $this->apiKey]
+        ]);
+    }
+
+    /**
+     * Knowledge Base Documents: get content by document id
+     */
+    public function getKnowledgeBaseDocumentContent(string $documentId): array
+    {
+        return $this->get("/convai/knowledge-base/documents/{$documentId}/content");
+    }
+
+    /**
+     * RAG Index overview
+     */
+    public function getRagIndexOverview(): array
+    {
+        return $this->get('/convai/knowledge-base/rag-index-overview');
     }
 
     /**
@@ -276,7 +325,8 @@ class AIService extends BaseElevenLabsService
      */
     public function getConversationAudio(string $conversationId): array
     {
-        $result = $this->postBinary("/convai/conversations/{$conversationId}/audio");
+        // API docs ko'p hollarda GET misollarini ko'rsatadi
+        $result = $this->getBinary("/convai/conversations/{$conversationId}/audio");
         
         if ($result['success']) {
             return [
@@ -321,5 +371,69 @@ class AIService extends BaseElevenLabsService
         }
         
         return $result;
+    }
+
+    /**
+     * Tools: list
+     */
+    public function listTools(): array
+    {
+        return $this->get('/convai/tools');
+    }
+
+    /**
+     * Tools: get
+     */
+    public function getTool(string $toolId): array
+    {
+        return $this->get("/convai/tools/{$toolId}");
+    }
+
+    /**
+     * Tools: create
+     */
+    public function createTool(array $payload): array
+    {
+        return $this->post('/convai/tools', ['json' => $payload]);
+    }
+
+    /**
+     * Tools: dependent agents
+     */
+    public function getDependentAgents(string $toolId): array
+    {
+        return $this->get("/convai/tools/{$toolId}/dependent-agents");
+    }
+
+    /**
+     * MCP servers: list
+     */
+    public function listMcpServers(): array
+    {
+        return $this->get('/convai/mcp-servers');
+    }
+
+    /**
+     * MCP servers: create
+     */
+    public function createMcpServer(array $payload): array
+    {
+        return $this->post('/convai/mcp-servers', ['json' => $payload]);
+    }
+
+    /**
+     * MCP approval policies: create
+     */
+    public function createMcpApprovalPolicy(array $payload): array
+    {
+        return $this->post('/convai/mcp-servers/approval-policies', ['json' => $payload]);
+    }
+
+    /**
+     * Dashboard settings
+     */
+    public function getDashboardSettings(): array
+    {
+        return $this->get('/convai/dashboard/settings');
     }
 }

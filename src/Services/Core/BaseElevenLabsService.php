@@ -138,4 +138,28 @@ abstract class BaseElevenLabsService
             ];
         }
     }
+
+    /**
+     * Make a GET request and return binary data
+     */
+    protected function getBinary(string $endpoint): array
+    {
+        try {
+            $response = $this->client->get($endpoint);
+
+            return [
+                'success' => true,
+                'data' => $response->getBody()->getContents(),
+                'content_type' => $response->getHeader('Content-Type')[0] ?? 'application/octet-stream',
+            ];
+        } catch (GuzzleException $e) {
+            Log::error('ElevenLabs GET Binary Error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+            ];
+        }
+    }
 }
