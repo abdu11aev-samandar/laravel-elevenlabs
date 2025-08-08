@@ -43,6 +43,41 @@ class WorkspaceService extends BaseElevenLabsService
     }
 
     /**
+     * Get a single workspace resource
+     */
+    public function getWorkspaceResource(string $resourceId): array
+    {
+        $result = $this->get("/workspace/resources/{$resourceId}");
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'resource' => $result['data'],
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Search workspace groups (accepts arbitrary query params for flexibility)
+     * Example: ['name' => 'mygroup'] or ['q' => 'my']
+     */
+    public function searchWorkspaceGroups(array $params = []): array
+    {
+        $endpoint = '/workspace/groups/search';
+        if (!empty($params)) {
+            $endpoint .= '?' . http_build_query($params);
+        }
+        $result = $this->get($endpoint);
+        if ($result['success']) {
+            return [
+                'success' => true,
+                'groups' => $result['data'],
+            ];
+        }
+        return $result;
+    }
+
+    /**
      * Get workspace members
      */
     public function getWorkspaceMembers(): array
@@ -87,5 +122,13 @@ class WorkspaceService extends BaseElevenLabsService
     public function removeWorkspaceMember(string $memberId): array
     {
         return $this->delete("/workspace/members/{$memberId}");
+    }
+
+    /**
+     * (Optional) Workspace-level secrets (distinct from convai/secrets)
+     */
+    public function getWorkspaceSecrets(): array
+    {
+        return $this->get('/workspace/secrets');
     }
 }
