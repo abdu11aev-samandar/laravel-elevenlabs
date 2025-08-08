@@ -1,0 +1,141 @@
+# GitHub Issues seed (namuna)
+# API ishlatish: /repos/{owner}/{repo}/issues (POST)
+# Har bir obyekt POST body sifatida ishlatiladi.
+
+issues:
+  - title: "Retry middleware: exponential backoff + Retry-After"
+    body: |
+      Acceptance Criteria:
+      - 429/5xx uchun retry (exponential backoff + jitter)
+      - Retry-After headerini hisobga olish
+      - config orqali boshqarish (enable/disable, max_attempts, base_delay_ms, max_delay_ms, respect_retry_after)
+
+      Tests:
+      - Unit: retry count va delay hisoblash
+      - Integration: 429→200 oqimi
+
+      Docs:
+      - README “Error handling & Retry” bo‘limi, config misollari
+    labels: [enhancement, reliability]
+    milestone: "v1.2 – Reliability & Config"
+
+  - title: "Cache: models va shared voices natijalarini qisqa TTL bilan saqlash"
+    body: |
+      Acceptance Criteria:
+      - GET /models va /shared-voices uchun TTL-based cache
+      - config orqali yoqish/o‘chirish, TTL belgilash
+
+      Tests:
+      - Cache hit/miss senariylari
+
+      Docs:
+      - README konfiguratsiya misollari
+    labels: [enhancement, performance]
+    milestone: "v1.2 – Reliability & Config"
+
+  - title: "DTO layer: typed javob obyektlari"
+    body: |
+      Acceptance Criteria:
+      - Service metodlari array bilan birga DTO qaytara olishi (dual mode)
+      - DTO mappinglar
+
+      Tests:
+      - DTO mapping unit testlar
+
+      Docs:
+      - DTO bilan ishlash bo‘limi
+    labels: [enhancement, dx]
+    milestone: "v1.3 – DX & Typed API"
+
+  - title: "TTS Builder: chainable ergonomika"
+    body: |
+      Acceptance Criteria:
+      - ->voice()->model()->style()->send() kabi chainable API
+      - Mavjud metodlar bilan yonma-yon ishlaydi
+
+      Tests:
+      - Builder chain testlari
+
+      Docs:
+      - Quickstart builder
+    labels: [enhancement, dx]
+    milestone: "v1.3 – DX & Typed API"
+
+  - title: "PSR-18 client adapter"
+    body: |
+      Acceptance Criteria:
+      - PSR-18 client injektsiyasi; default Guzzle
+
+      Tests:
+      - PSR-18 mock bilan unit testlar
+
+      Docs:
+      - PSR-18 usage bo‘limi
+    labels: [enhancement, standards]
+    milestone: "v1.4 – PSR-18 Support"
+
+  - title: "Observability: log/tracing va sensitive data maskalash"
+    body: |
+      Acceptance Criteria:
+      - Request/response timing va endpoint’lar log/tracing
+      - API key va audio kabi ma’lumotlarni maskalash
+
+      Tests:
+      - Log sanitizatsiya testlari
+
+      Docs:
+      - Observability bo‘limi
+    labels: [enhancement, observability]
+    milestone: "v1.5 – Observability & Audit"
+
+  - title: "Audit: muhim amallar uchun eventlar"
+    body: |
+      Acceptance Criteria:
+      - Voice delete, dictionary edit va h.k. uchun Laravel eventlar
+
+      Tests:
+      - Event dispatch testlari
+
+      Docs:
+      - Eventlar ro‘yxati
+    labels: [enhancement, audit]
+    milestone: "v1.5 – Observability & Audit"
+
+  - title: "Artisan komandalar: elevenlabs:tts, elevenlabs:audio-isolate, elevenlabs:dub"
+    body: |
+      Acceptance Criteria:
+      - CLI komandalar muvaffaqiyatli ishlaydi (exit code)
+
+      Tests:
+      - Console tester orqali komandalar testi
+
+      Docs:
+      - CLI usage bo‘limi
+    labels: [enhancement, cli]
+    milestone: "v1.6 – CLI & Workflows"
+
+  - title: "Webhook/Queue integratsiyasi"
+    body: |
+      Acceptance Criteria:
+      - Webhook controller, imzo tekshiruvi bo‘lsa qo‘llab-quvvatlash
+      - Queue jobs orqali uzoq jarayonlarni boshqarish
+
+      Tests:
+      - Feature testlar
+
+      Docs:
+      - Webhook setup bo‘limi
+    labels: [enhancement, integration]
+    milestone: "v1.7 – Webhook/Queue"
+
+  - title: "v2.0 migration: Exception-first error handling, default client va interfeyslar"
+    body: |
+      Acceptance Criteria:
+      - success/array o‘rniga Exception-first default
+      - Legacy rejim config flag bilan
+      - Interfeyslar (AudioServiceInterface, ...)
+
+      Docs:
+      - Migration Guide
+    labels: [breaking-change]
+    milestone: "v2.0 – Breaking Changes"

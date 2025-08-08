@@ -1,0 +1,49 @@
+name: Bug report
+description: Xatolik haqida xabar bering
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Xulosa
+      description: Muammo qisqacha mazmuni
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Qayta yaratish bosqichlari
+      description: Qadam-baqadam qanday qilib muammo qayta yaratiladi
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kutilgan natija
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Haqiqiy natija
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Paket versiyasi
+      placeholder: v1.1.0
+  - type: textarea
+    id: env
+    attributes:
+      label: Muhit ma’lumotlari
+      placeholder: PHP, Laravel versiyalari, OS
+  - type: textarea
+    id: logs
+    attributes:
+      label: Loglar/stack trace
+      render: shell

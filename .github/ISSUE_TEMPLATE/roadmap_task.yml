@@ -1,0 +1,41 @@
+name: Roadmap Task
+description: Yangi imkoniyat yoki yaxshilash bo‘yicha roadmap vazifasi
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ushbu shakl roadmapdagi enhancement’lar uchun.
+  - type: input
+    id: version
+    attributes:
+      label: Maqsadli versiya
+      description: Masalan, v1.2, v1.3
+      placeholder: v1.2
+  - type: textarea
+    id: description
+    attributes:
+      label: Tavsif
+      description: Qisqacha vazifa ta’rifi
+      placeholder: Nima qo‘shiladi yoki yaxshilanadi?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Aniq qabul shartlari
+      placeholder: • ...
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests
+      description: Qanday testlar yoziladi?
+      placeholder: Unit/Integration/Feature testlar ro‘yxati
+  - type: textarea
+    id: docs
+    attributes:
+      label: Docs
+      description: README/ROADMAP/CHANGELOG yoki docs/ bo‘limida nima yangilanadi?

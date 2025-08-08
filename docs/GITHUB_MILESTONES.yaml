@@ -1,0 +1,26 @@
+# GitHub Milestones seed (namuna)
+# Bu fayl GitHub API orqali milestones yaratishga yordam beruvchi ma’lumotlarni jamlaydi.
+# API ishlatish: /repos/{owner}/{repo}/milestones (POST)
+# Har bir obyekt POST body sifatida ishlatiladi.
+
+milestones:
+  - title: v1.2 – Reliability & Config
+    state: open
+    description: Retry/backoff, rate-limit awareness va kichik cache qo‘shish
+    due_on: 2025-09-01T00:00:00Z
+  - title: v1.3 – DX & Typed API
+    state: open
+    description: DTO layer va TTS Builder ergonomikasi
+    due_on: 2025-09-15T00:00:00Z
+  - title: v1.4 – PSR-18 Support
+    state: open
+    description: PSR-18 client adapterini qo‘shish
+    due_on: 2025-10-01T00:00:00Z
+  - title: v1.5 – Observability & Audit
+    state: open
+    description: Log/tracing va audit eventlar
+    due_on: 2025-10-15T00:00:00Z
+  - title: v2.0 – Breaking Changes
+    state: open
+    description: Exception-first error handling, default client o‘zgarishi, interfeyslar
+    due_on: 2025-12-01T00:00:00Z
