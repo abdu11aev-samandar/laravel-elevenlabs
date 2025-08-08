@@ -164,14 +164,15 @@ $result = ElevenLabs::audio()->textToSpeechAndSave(
     storage_path('app/test-speech.mp3')
 );
 
-// 🆕 NEW: Audio Isolation - Remove background noise
-$isolatedAudio = ElevenLabs::audio()->isolateAudio($uploadedFile);
+// 🆕 NEW: Audio Isolation (experimental)
+// Note: This method is experimental and may change as ElevenLabs finalizes the endpoint.
+$isolatedAudio = ElevenLabs::audio()->audioIsolation($uploadedFile);
 
 // 🆕 NEW: Sound Generation - Create sound effects from text
-$soundEffect = ElevenLabs::audio()->generateSounds(
+$soundEffect = ElevenLabs::audio()->soundGeneration(
     'Thunder and rain sounds',  // Text description
-    10.0,                      // Duration in seconds
-    false                      // Prompt influence (optional)
+    10,                         // Duration in seconds (optional)
+    'strong'                    // Prompt influence or guidance (optional)
 );
 ```
 
@@ -230,12 +231,43 @@ $result = ElevenLabs::ai()->createKnowledgeBaseFromURL('https://docs.example.com
 $knowledgeBases = ElevenLabs::ai()->getKnowledgeBases();
 $result = ElevenLabs::ai()->deleteKnowledgeBase('kb_id');
 
+// Knowledge base documents (file upload)
+$multipart = [
+    [
+        'name' => 'file',
+        'contents' => fopen(storage_path('app/docs.pdf'), 'r'),
+        'filename' => 'docs.pdf'
+    ]
+];
+$doc = ElevenLabs::ai()->createKnowledgeBaseDocumentFromFile($multipart);
+$docContent = ElevenLabs::ai()->getKnowledgeBaseDocumentContent('document_id');
+
+// RAG Index overview
+$rag = ElevenLabs::ai()->getRagIndexOverview();
+
 // Workspace secrets
 $secrets = ElevenLabs::ai()->getWorkspaceSecrets();
 
+// 🆕 NEW: Signed URL and Widget
+$signed = ElevenLabs::ai()->getSignedUrl('agent_id_here');
+$widget = ElevenLabs::ai()->getAgentWidgetConfig('agent_id_here');
+
+// 🆕 NEW: Tools and MCP Servers
+$tools = ElevenLabs::ai()->listTools();
+$tool = ElevenLabs::ai()->getTool('tool_id');
+$createdTool = ElevenLabs::ai()->createTool(['name' => 'Search Tool']);
+$dependentAgents = ElevenLabs::ai()->getDependentAgents('tool_id');
+
+$mcpServers = ElevenLabs::ai()->listMcpServers();
+$createdMcp = ElevenLabs::ai()->createMcpServer(['name' => 'Internal MCP']);
+$approval = ElevenLabs::ai()->createMcpApprovalPolicy(['policy' => 'allow_all']);
+
+// Dashboard settings
+$dashboard = ElevenLabs::ai()->getDashboardSettings();
+
 // 🆕 NEW: AI Agents Management
 // List all conversational AI agents with pagination
-$agents = ElevenLabs::ai()->listAgents(10, 'cursor_here');
+$agents = ElevenLabs::ai()->getAgents('cursor_here', 10);
 
 // Create a new AI agent
 $agentData = [
@@ -248,8 +280,7 @@ $newAgent = ElevenLabs::ai()->createAgent($agentData);
 
 // 🆕 NEW: Conversations Management
 // List conversations with pagination and filters
-$conversations = ElevenLabs::ai()->listConversations(
-    'agent_id_here',
+$conversations = ElevenLabs::ai()->getConversations(
     'cursor_here',
     10 // page size
 );
@@ -275,7 +306,7 @@ $callsData = [
 $batchJob = ElevenLabs::ai()->submitBatchCalling($callsData);
 
 // Get batch calling status
-$status = ElevenLabs::ai()->getBatchCallStatus('batch_id');
+$status = ElevenLabs::ai()->getBatchCalling('batch_id');
 ```
 
 #### Studio Service (Projects & Dubbing)
@@ -284,6 +315,12 @@ $status = ElevenLabs::ai()->getBatchCallStatus('batch_id');
 // Studio projects
 $projects = ElevenLabs::studio()->getStudioProjects();
 $project = ElevenLabs::studio()->getStudioProject('project_id');
+
+// Chapters and snapshots
+$chapter = ElevenLabs::studio()->getChapter('project_id', 'chapter_id');
+$chapterSnaps = ElevenLabs::studio()->listChapterSnapshots('project_id', 'chapter_id');
+$chapterSnapshot = ElevenLabs::studio()->getChapterSnapshot('project_id', 'chapter_id', 'snapshot_id');
+$projectSnapshot = ElevenLabs::studio()->getProjectSnapshot('project_id', 'project_snapshot_id');
 
 // Create project from file
 $result = ElevenLabs::studio()->createStudioProject(
@@ -310,6 +347,9 @@ $audio = ElevenLabs::studio()->getDubbedAudio('dubbing_id', 'es');
 
 // Podcast projects
 $result = ElevenLabs::studio()->createPodcastProject($podcastData);
+
+// Dubbing transcript (SRT/WEBVTT)
+$transcript = ElevenLabs::studio()->getDubbingTranscript('dubbing_id', 'srt');
 ```
 
 #### Analytics Service (Usage & History)
@@ -340,6 +380,21 @@ $result = ElevenLabs::workspace()->shareWorkspaceResource(
     'resource_id',
     $shareData
 );
+
+// Get resources and a specific resource
+$resources = ElevenLabs::workspace()->getWorkspaceResources();
+$resource = ElevenLabs::workspace()->getWorkspaceResource('resource_id');
+
+// Search groups
+$groups = ElevenLabs::workspace()->searchWorkspaceGroups(['q' => 'team']);
+
+// Members
+$members = ElevenLabs::workspace()->getWorkspaceMembers();
+$invitation = ElevenLabs::workspace()->inviteWorkspaceMember('user@example.com', ['read']);
+$removed = ElevenLabs::workspace()->removeWorkspaceMember('member_id');
+
+// Workspace-level secrets (optional)
+$workspaceSecrets = ElevenLabs::workspace()->getWorkspaceSecrets();
 ```
 
 ### 🔄 Legacy Approach (Backward Compatible)

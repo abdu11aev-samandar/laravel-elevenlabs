@@ -205,9 +205,9 @@ class AIServiceNewEndpointsTest extends TestCase
         $mockResponse = new Response(200, ['Content-Type' => 'audio/mpeg'], $audioData);
         
         $this->mockClient
-            ->shouldReceive('post')
+            ->shouldReceive('get')
             ->once()
-            ->with("/convai/conversations/{$conversationId}/audio", Mockery::any())
+            ->with("/convai/conversations/{$conversationId}/audio")
             ->andReturn($mockResponse);
 
         $result = $this->service->getConversationAudio($conversationId);
@@ -333,7 +333,7 @@ class AIServiceNewEndpointsTest extends TestCase
         $conversationId = 'invalid-conv-id';
         
         $this->mockClient
-            ->shouldReceive('post')
+            ->shouldReceive('get')
             ->once()
             ->andThrow(new RequestException('Conversation not found', Mockery::mock('Psr\Http\Message\RequestInterface')));
 

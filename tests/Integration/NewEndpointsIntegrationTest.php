@@ -165,9 +165,9 @@ class NewEndpointsIntegrationTest extends TestCase
         $audioResponse = new Response(200, ['Content-Type' => 'audio/mpeg'], 'conversation-audio-data');
         
         $this->mockClient
-            ->shouldReceive('post')
+            ->shouldReceive('get')
             ->once()
-            ->with('/convai/conversations/conv-1/audio', Mockery::any())
+            ->with('/convai/conversations/conv-1/audio')
             ->andReturn($audioResponse);
 
         // Execute complete workflow

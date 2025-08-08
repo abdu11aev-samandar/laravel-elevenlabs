@@ -18,7 +18,7 @@ class AudioService extends BaseElevenLabsService
         UploadedFile|string|null $file = null
     ): array {
         $multipart = [
-            ['name' = 'name', 'contents' = $name],
+            ['name' => 'name', 'contents' => $name],
         ];
 
         // Map known optional fields
@@ -30,22 +30,22 @@ class AudioService extends BaseElevenLabsService
             if (array_key_exists($key, $options) && $options[$key] !== null) {
                 $val = $options[$key];
                 if (is_bool($val)) { $val = $val ? 'true' : 'false'; }
-                $multipart[] = ['name' = $key, 'contents' = (string) $val];
+                $multipart[] = ['name' => $key, 'contents' => (string) $val];
             }
         }
 
         if ($file) {
             if ($file instanceof UploadedFile) {
                 $multipart[] = [
-                    'name' = 'file',
-                    'contents' = fopen($file->getPathname(), 'r'),
-                    'filename' = $file->getClientOriginalName(),
+                    'name' => 'file',
+                    'contents' => fopen($file->getPathname(), 'r'),
+                    'filename' => $file->getClientOriginalName(),
                 ];
             } else {
                 $multipart[] = [
-                    'name' = 'file',
-                    'contents' = fopen($file, 'r'),
-                    'filename' = basename($file),
+                    'name' => 'file',
+                    'contents' => fopen($file, 'r'),
+                    'filename' => basename($file),
                 ];
             }
         }
