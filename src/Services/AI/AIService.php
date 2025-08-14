@@ -11,7 +11,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getSignedUrl(string $agentId): array
     {
-        $endpoint = '/convai/conversations/get-signed-url?'.http_build_query(['agent_id' => $agentId]);
+        $endpoint = 'convai/conversations/get-signed-url?'.http_build_query(['agent_id' => $agentId]);
         return $this->get($endpoint);
     }
 
@@ -24,7 +24,7 @@ class AIService extends BaseElevenLabsService
         if ($conversationSignature) {
             $query['conversation_signature'] = $conversationSignature;
         }
-        $endpoint = "/convai/agents/{$agentId}/widget" . (!empty($query) ? ('?'.http_build_query($query)) : '');
+        $endpoint = "convai/agents/{$agentId}/widget" . (!empty($query) ? ('?'.http_build_query($query)) : '');
         return $this->get($endpoint);
     }
     /**
@@ -32,7 +32,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getConversationalAISettings(): array
     {
-        $result = $this->get('/convai/settings');
+        $result = $this->get('convai/settings');
 
         if ($result['success']) {
             return [
@@ -49,7 +49,7 @@ class AIService extends BaseElevenLabsService
      */
     public function updateConversationalAISettings(array $settings): array
     {
-        return $this->patch('/convai/settings', [
+        return $this->patch('convai/settings', [
             'json' => $settings
         ]);
     }
@@ -59,7 +59,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getWorkspaceSecrets(): array
     {
-        $result = $this->get('/convai/secrets');
+        $result = $this->get('convai/secrets');
 
         if ($result['success']) {
             return [
@@ -76,7 +76,7 @@ class AIService extends BaseElevenLabsService
      */
     public function createKnowledgeBaseFromURL(string $url): array
     {
-        $result = $this->post('/convai/knowledge-base/url', [
+        $result = $this->post('convai/knowledge-base/url', [
             'json' => ['url' => $url]
         ]);
 
@@ -100,7 +100,7 @@ class AIService extends BaseElevenLabsService
         if ($pageSize) $params['page_size'] = $pageSize;
 
         $queryString = $params ? '?' . http_build_query($params) : '';
-        $result = $this->get('/convai/knowledge-base' . $queryString);
+        $result = $this->get('convai/knowledge-base' . $queryString);
 
         if ($result['success']) {
             return [
@@ -117,7 +117,7 @@ class AIService extends BaseElevenLabsService
      */
     public function deleteKnowledgeBase(string $documentationId): array
     {
-        return $this->delete("/convai/knowledge-base/{$documentationId}");
+        return $this->delete("convai/knowledge-base/{$documentationId}");
     }
 
     /**
@@ -126,7 +126,7 @@ class AIService extends BaseElevenLabsService
     public function createKnowledgeBaseDocumentFromFile(array $multipart): array
     {
         // $multipart e.g. [['name' => 'file', 'contents' => fopen(...), 'filename' => '...'], ...]
-        return $this->post('/convai/knowledge-base/documents/create-from-file', [
+        return $this->post('convai/knowledge-base/documents/create-from-file', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -137,7 +137,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getKnowledgeBaseDocumentContent(string $documentId): array
     {
-        return $this->get("/convai/knowledge-base/documents/{$documentId}/content");
+        return $this->get("convai/knowledge-base/documents/{$documentId}/content");
     }
 
     /**
@@ -145,7 +145,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getRagIndexOverview(): array
     {
-        return $this->get('/convai/knowledge-base/rag-index-overview');
+        return $this->get('convai/knowledge-base/rag-index-overview');
     }
 
     /**
@@ -157,7 +157,7 @@ class AIService extends BaseElevenLabsService
         if ($cursor) $query['cursor'] = $cursor;
         if ($pageSize) $query['page_size'] = $pageSize;
         
-        $endpoint = '/convai/agents';
+        $endpoint = 'convai/agents';
         if (!empty($query)) {
             $endpoint .= '?' . http_build_query($query);
         }
@@ -179,7 +179,7 @@ class AIService extends BaseElevenLabsService
      */
     public function createAgent(array $agentData): array
     {
-        $result = $this->post('/convai/agents/create', [
+        $result = $this->post('convai/agents/create', [
             'json' => $agentData
         ]);
 
@@ -198,7 +198,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getAgent(string $agentId): array
     {
-        $result = $this->get("/convai/agents/{$agentId}");
+        $result = $this->get("convai/agents/{$agentId}");
 
         if ($result['success']) {
             return [
@@ -215,7 +215,7 @@ class AIService extends BaseElevenLabsService
      */
     public function updateAgent(string $agentId, array $agentData): array
     {
-        $result = $this->post("/convai/agents/{$agentId}", [
+        $result = $this->post("convai/agents/{$agentId}", [
             'json' => $agentData
         ]);
 
@@ -234,7 +234,7 @@ class AIService extends BaseElevenLabsService
      */
     public function deleteAgent(string $agentId): array
     {
-        return $this->delete("/convai/agents/{$agentId}");
+        return $this->delete("convai/agents/{$agentId}");
     }
 
     /**
@@ -252,7 +252,7 @@ class AIService extends BaseElevenLabsService
         if ($callStartAfterUnix) $query['call_start_after_unix'] = $callStartAfterUnix;
         if ($callStartBeforeUnix) $query['call_start_before_unix'] = $callStartBeforeUnix;
         
-        $endpoint = '/convai/conversations';
+        $endpoint = 'convai/conversations';
         if (!empty($query)) {
             $endpoint .= '?' . http_build_query($query);
         }
@@ -274,7 +274,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getAgentConversations(string $agentId): array
     {
-        $result = $this->get("/convai/agents/{$agentId}/conversations");
+        $result = $this->get("convai/agents/{$agentId}/conversations");
 
         if ($result['success']) {
             return [
@@ -291,7 +291,7 @@ class AIService extends BaseElevenLabsService
      */
     public function createConversation(string $agentId): array
     {
-        $result = $this->post("/convai/agents/{$agentId}/conversations");
+        $result = $this->post("convai/agents/{$agentId}/conversations");
 
         if ($result['success']) {
             return [
@@ -308,7 +308,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getConversation(string $conversationId): array
     {
-        $result = $this->get("/convai/conversations/{$conversationId}");
+        $result = $this->get("convai/conversations/{$conversationId}");
         
         if ($result['success']) {
             return [
@@ -326,7 +326,7 @@ class AIService extends BaseElevenLabsService
     public function getConversationAudio(string $conversationId): array
     {
         // API docs ko'p hollarda GET misollarini ko'rsatadi
-        $result = $this->getBinary("/convai/conversations/{$conversationId}/audio");
+        $result = $this->getBinary("convai/conversations/{$conversationId}/audio");
         
         if ($result['success']) {
             return [
@@ -344,7 +344,7 @@ class AIService extends BaseElevenLabsService
      */
     public function submitBatchCalling(array $batchData): array
     {
-        $result = $this->post('/convai/batch-calling/submit', ['json' => $batchData]);
+        $result = $this->post('convai/batch-calling/submit', ['json' => $batchData]);
         
         if ($result['success']) {
             return [
@@ -361,7 +361,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getBatchCalling(string $batchId): array
     {
-        $result = $this->get("/convai/batch-calling/{$batchId}");
+        $result = $this->get("convai/batch-calling/{$batchId}");
         
         if ($result['success']) {
             return [
@@ -378,7 +378,7 @@ class AIService extends BaseElevenLabsService
      */
     public function listTools(): array
     {
-        return $this->get('/convai/tools');
+        return $this->get('convai/tools');
     }
 
     /**
@@ -386,7 +386,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getTool(string $toolId): array
     {
-        return $this->get("/convai/tools/{$toolId}");
+        return $this->get("convai/tools/{$toolId}");
     }
 
     /**
@@ -394,7 +394,7 @@ class AIService extends BaseElevenLabsService
      */
     public function createTool(array $payload): array
     {
-        return $this->post('/convai/tools', ['json' => $payload]);
+        return $this->post('convai/tools', ['json' => $payload]);
     }
 
     /**
@@ -402,7 +402,7 @@ class AIService extends BaseElevenLabsService
      */
     public function getDependentAgents(string $toolId): array
     {
-        return $this->get("/convai/tools/{$toolId}/dependent-agents");
+        return $this->get("convai/tools/{$toolId}/dependent-agents");
     }
 
     /**
@@ -410,7 +410,7 @@ class AIService extends BaseElevenLabsService
      */
     public function listMcpServers(): array
     {
-        return $this->get('/convai/mcp-servers');
+        return $this->get('convai/mcp-servers');
     }
 
     /**
@@ -418,7 +418,7 @@ class AIService extends BaseElevenLabsService
      */
     public function createMcpServer(array $payload): array
     {
-        return $this->post('/convai/mcp-servers', ['json' => $payload]);
+        return $this->post('convai/mcp-servers', ['json' => $payload]);
     }
 
     /**
@@ -426,7 +426,7 @@ class AIService extends BaseElevenLabsService
      */
     public function createMcpApprovalPolicy(array $payload): array
     {
-        return $this->post('/convai/mcp-servers/approval-policies', ['json' => $payload]);
+        return $this->post('convai/mcp-servers/approval-policies', ['json' => $payload]);
     }
 
     /**
@@ -434,6 +434,6 @@ class AIService extends BaseElevenLabsService
      */
     public function getDashboardSettings(): array
     {
-        return $this->get('/convai/dashboard/settings');
+        return $this->get('convai/dashboard/settings');
     }
 }

@@ -30,7 +30,7 @@ return [
     | ElevenLabs API base URL. You can override it via env if needed.
     |
     */
-    'base_uri' => env('ELEVENLABS_BASE_URI', 'https://api.elevenlabs.io/v1'),
+    'base_uri' => env('ELEVENLABS_BASE_URI', 'https://api.elevenlabs.io/v1/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -100,4 +100,92 @@ return [
     |
     */
     'log_requests' => env('ELEVENLABS_LOG_REQUESTS', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sound Generation Settings
+    |--------------------------------------------------------------------------
+    |
+    | Default settings for sound effects generation.
+    |
+    */
+    'sound_generation' => [
+        'default_duration' => env('ELEVENLABS_SOUND_DURATION', 3), // seconds
+        'max_duration' => 22, // ElevenLabs limit
+        'min_duration' => 0.5, // ElevenLabs limit
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Audio Isolation Settings
+    |--------------------------------------------------------------------------
+    |
+    | Settings for audio isolation (noise removal) feature.
+    |
+    */
+    'audio_isolation' => [
+        'enabled' => env('ELEVENLABS_AUDIO_ISOLATION_ENABLED', true),
+        'supported_formats' => ['wav', 'mp3', 'flac', 'ogg'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Conversational AI Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for AI agents and conversations.
+    |
+    */
+    'conversational_ai' => [
+        'default_turn_timeout' => env('ELEVENLABS_AI_TURN_TIMEOUT', 7), // seconds
+        'max_conversation_duration' => env('ELEVENLABS_AI_MAX_DURATION', 600), // seconds
+        'enable_batch_calling' => env('ELEVENLABS_BATCH_CALLING_ENABLED', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Voice Preview Settings
+    |--------------------------------------------------------------------------
+    |
+    | Settings for voice preview generation.
+    |
+    */
+    'voice_preview' => [
+        'max_text_length' => env('ELEVENLABS_PREVIEW_MAX_TEXT', 500),
+        'default_preview_count' => env('ELEVENLABS_PREVIEW_COUNT', 3),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retry Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Settings for retry logic and exponential backoff.
+    |
+    */
+    'retry' => [
+        'enabled' => env('ELEVENLABS_RETRY_ENABLED', true),
+        'max_attempts' => env('ELEVENLABS_RETRY_MAX_ATTEMPTS', 3),
+        'base_delay_ms' => env('ELEVENLABS_RETRY_BASE_DELAY_MS', 1000),
+        'max_delay_ms' => env('ELEVENLABS_RETRY_MAX_DELAY_MS', 60000),
+        'respect_retry_after' => env('ELEVENLABS_RETRY_RESPECT_RETRY_AFTER', true),
+        'use_jitter' => env('ELEVENLABS_RETRY_USE_JITTER', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logging Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Settings for ElevenLabs API logging.
+    |
+    */
+    'logging' => [
+        'enabled' => env('ELEVENLABS_LOGGING_ENABLED', true),
+        'log_requests' => env('ELEVENLABS_LOG_REQUESTS', false),
+        'log_responses' => env('ELEVENLABS_LOG_RESPONSES', true),
+        'log_retries' => env('ELEVENLABS_LOG_RETRIES', true),
+        'log_rate_limits' => env('ELEVENLABS_LOG_RATE_LIMITS', true),
+        'channel' => env('ELEVENLABS_LOG_CHANNEL', null), // null = use default logger
+    ],
 ];

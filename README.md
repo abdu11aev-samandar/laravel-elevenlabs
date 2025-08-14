@@ -661,6 +661,45 @@ return [
 
 ## Testing
 
+### Unit & Integration Tests
+
+Run the test suite:
+
+```bash
+composer test
+```
+
+Or with PHPUnit directly:
+
+```bash
+./vendor/bin/phpunit
+```
+
+### Real API Tests
+
+To run tests against the actual ElevenLabs API (requires API key):
+
+```bash
+# Set your API key
+export ELEVENLABS_API_KEY="your-api-key-here"
+
+# Run automated test script until 100% pass
+./run_real_api_tests.sh
+
+# Or run directly with PHPUnit
+./vendor/bin/phpunit --group=real-api
+```
+
+**Features:**
+- 🔄 **Automated retry logic** - Runs until 100% success or max attempts
+- 📊 **Detailed reporting** - Tracks success rates and failure analysis  
+- 🤖 **GitHub Actions integration** - CI/CD with matrix testing
+- 🔧 **Auto-fix suggestions** - Analyzes failures and provides solutions
+
+See [REAL_API_TEST_GUIDE.md](REAL_API_TEST_GUIDE.md) for complete documentation.
+
+## Testing
+
 To run the tests:
 
 ```bash

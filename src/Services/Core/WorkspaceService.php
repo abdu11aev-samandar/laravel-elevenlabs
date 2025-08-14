@@ -11,7 +11,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function shareWorkspaceResource(string $resourceId, array $shareData): array
     {
-        $result = $this->post("/workspace/resources/{$resourceId}/share", [
+        $result = $this->post("workspace/resources/{$resourceId}/share", [
             'json' => $shareData
         ]);
 
@@ -30,7 +30,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function getWorkspaceResources(): array
     {
-        $result = $this->get('/workspace/resources');
+        $result = $this->get('workspace/resources');
 
         if ($result['success']) {
             return [
@@ -47,7 +47,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function getWorkspaceResource(string $resourceId): array
     {
-        $result = $this->get("/workspace/resources/{$resourceId}");
+        $result = $this->get("workspace/resources/{$resourceId}");
         if ($result['success']) {
             return [
                 'success' => true,
@@ -63,7 +63,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function searchWorkspaceGroups(array $params = []): array
     {
-        $endpoint = '/workspace/groups/search';
+        $endpoint = 'workspace/groups/search';
         if (!empty($params)) {
             $endpoint .= '?' . http_build_query($params);
         }
@@ -82,7 +82,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function getWorkspaceMembers(): array
     {
-        $result = $this->get('/workspace/members');
+        $result = $this->get('workspace/members');
 
         if ($result['success']) {
             return [
@@ -99,7 +99,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function inviteWorkspaceMember(string $email, array $permissions = []): array
     {
-        $result = $this->post('/workspace/members/invite', [
+        $result = $this->post('workspace/members/invite', [
             'json' => [
                 'email' => $email,
                 'permissions' => $permissions,
@@ -121,7 +121,7 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function removeWorkspaceMember(string $memberId): array
     {
-        return $this->delete("/workspace/members/{$memberId}");
+        return $this->delete("workspace/members/{$memberId}");
     }
 
     /**
@@ -129,6 +129,6 @@ class WorkspaceService extends BaseElevenLabsService
      */
     public function getWorkspaceSecrets(): array
     {
-        return $this->get('/workspace/secrets');
+        return $this->get('workspace/secrets');
     }
 }

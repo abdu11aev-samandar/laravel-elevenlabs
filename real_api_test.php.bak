@@ -1,0 +1,387 @@
+<?php
+
+/**
+ * ElevenLabs API Real Test Script
+ * 
+ * Bu skript haqiqiy API key bilan barcha metodlarni test qiladi
+ * 
+ * Ishlatish:
+ * 1. API_KEY ni o'zgartirib qo'ying
+ * 2. php real_api_test.php
+ */
+
+require_once 'vendor/autoload.php';
+
+use Samandar\LaravelElevenLabs\Services\ElevenLabsService;
+use Samandar\LaravelElevenLabs\Services\Audio\AudioService;
+use Samandar\LaravelElevenLabs\Services\Voice\VoiceService;
+use Samandar\LaravelElevenLabs\Services\Analytics\AnalyticsService;
+use Samandar\LaravelElevenLabs\Services\AI\AIService;
+use Samandar\LaravelElevenLabs\Services\Studio\StudioService;
+use Samandar\LaravelElevenLabs\Services\Core\WorkspaceService;
+
+class ElevenLabsRealApiTest
+{
+    private string $apiKey;
+    private ElevenLabsService $service;
+    private array $testResults = [];
+    private string $testAudioPath;
+    private string $outputDir;
+
+    public function __construct(string $apiKey)
+    {
+        $this->apiKey = $apiKey;
+        $this->service = new ElevenLabsService($apiKey);
+        $this->outputDir = __DIR__ . '/test_output';
+        $this->testAudioPath = __DIR__ . '/test_audio';
+        
+        // Create directories if they don't exist
+        if (!is_dir($this->outputDir)) {
+            mkdir($this->outputDir, 0755, true);
+        }
+        if (!is_dir($this->testAudioPath)) {
+            mkdir($this->testAudioPath, 0755, true);
+        }
+    }
+
+    public function runAllTests(): void
+    {
+        echo "🚀 ElevenLabs API Real Test boshlandi...\n\n";
+        
+        // Test all services
+        $this->testAnalyticsService();
+        $this->testVoiceService();
+        $this->testAudioService();
+        $this->testAIService();
+        $this->testStudioService();
+        $this->testWorkspaceService();
+        
+        // Print summary
+        $this->printSummary();
+    }
+
+    private function testAnalyticsService(): void
+    {
+        echo "📊 Analytics Service test qilinmoqda...\n";
+        
+        // Get user info
+        $this->runTest('getUserInfo', function() {
+            return $this->service->analytics()->getUserInfo();
+        });
+        
+        // Get user subscription
+        $this->runTest('getUserSubscription', function() {
+            return $this->service->analytics()->getUserSubscription();
+        });
+        
+        // Get models
+        $this->runTest('getModels', function() {
+            return $this->service->analytics()->getModels();
+        });
+        
+        // Get character usage
+        $this->runTest('getCharacterUsage', function() {
+            return $this->service->analytics()->getCharacterUsage();
+        });
+        
+        // Get history
+        $this->runTest('getHistory', function() {
+            return $this->service->analytics()->getHistory(10);
+        });
+        
+        echo "\n";
+    }
+
+    private function testVoiceService(): void
+    {
+        echo "🎭 Voice Service test qilinmoqda...\n";
+        
+        // Get voices
+        $voices = $this->runTest('getVoices', function() {
+            return $this->service->voice()->getVoices();
+        });
+        
+        // Get voice details (first available voice)
+        if ($voices && isset($voices['voices'][0])) {
+            $voiceId = $voices['voices'][0]['voice_id'];
+            $this->runTest('getVoice', function() use ($voiceId) {
+                return $this->service->voice()->getVoice($voiceId);
+            });
+        }
+        
+        // Get shared voices
+        $this->runTest('getSharedVoices', function() {
+            return $this->service->voice()->getSharedVoices();
+        });
+        
+        // Get pronunciation dictionaries
+        $this->runTest('getPronunciationDictionaries', function() {
+            return $this->service->voice()->getPronunciationDictionaries();
+        });
+        
+        // Create voice previews (if we have a voice)
+        if ($voices && isset($voices['voices'][0])) {
+            $voiceId = $voices['voices'][0]['voice_id'];
+            $this->runTest('createVoicePreviews', function() use ($voiceId) {
+                return $this->service->voice()->createVoicePreviews(
+                    'Salom, bu test ovozi',
+                    $voiceId
+                );
+            });
+        }
+        
+        echo "\n";
+    }
+
+    private function testAudioService(): void
+    {
+        echo "🎵 Audio Service test qilinmoqda...\n";
+        
+        // Text-to-Speech
+        $ttsResult = $this->runTest('textToSpeech', function() {
+            return $this->service->audio()->textToSpeech(
+                'Salom, bu ElevenLabs test ovozi',
+                '21m00Tcm4TlvDq8ikWAM'
+            );
+        });
+        
+        // Save TTS audio to file
+        if ($ttsResult && isset($ttsResult['audio'])) {
+            $audioFile = $this->outputDir . '/test_tts.mp3';
+            $saved = $this->service->audio()->saveAudioToFile($ttsResult['audio'], $audioFile);
+            echo $saved ? "✅ Audio fayl saqlandi: $audioFile\n" : "❌ Audio fayl saqlanmadi\n";
+            
+            // Text-to-Speech and Save (combined method)
+            $this->runTest('textToSpeechAndSave', function() {
+                $filePath = $this->outputDir . '/test_tts_combined.mp3';
+                return $this->service->audio()->textToSpeechAndSave(
+                    'Bu kombinatsiyalangan usul bilan yaratilgan ovoz',
+                    $filePath
+                );
+            });
+        }
+        
+        // Sound Generation (experimental)
+        $this->runTest('soundGeneration', function() {
+            return $this->service->audio()->soundGeneration(
+                'Ocean waves and seagulls',
+                10, // 10 seconds
+                'calm'
+            );
+        });
+        
+        echo "\n";
+    }
+
+    private function testAIService(): void
+    {
+        echo "🤖 AI Service test qilinmoqda...\n";
+        
+        // Get conversational AI settings
+        $this->runTest('getConversationalAISettings', function() {
+            return $this->service->ai()->getConversationalAISettings();
+        });
+        
+        // Get workspace secrets
+        $this->runTest('getWorkspaceSecrets', function() {
+            return $this->service->ai()->getWorkspaceSecrets();
+        });
+        
+        // Get knowledge bases
+        $this->runTest('getKnowledgeBases', function() {
+            return $this->service->ai()->getKnowledgeBases();
+        });
+        
+        // Get agents
+        $agents = $this->runTest('getAgents', function() {
+            return $this->service->ai()->getAgents();
+        });
+        
+        // Get conversations
+        $this->runTest('getConversations', function() {
+            return $this->service->ai()->getConversations();
+        });
+        
+        // If we have agents, get agent conversations
+        if ($agents && isset($agents['agents'][0])) {
+            $agentId = $agents['agents'][0]['agent_id'];
+            $this->runTest('getAgentConversations', function() use ($agentId) {
+                return $this->service->ai()->getAgentConversations($agentId);
+            });
+        }
+        
+        echo "\n";
+    }
+
+    private function testStudioService(): void
+    {
+        echo "🎬 Studio Service test qilinmoqda...\n";
+        
+        // Get studio projects
+        $this->runTest('getStudioProjects', function() {
+            return $this->service->studio()->getStudioProjects();
+        });
+        
+        echo "\n";
+    }
+
+    private function testWorkspaceService(): void
+    {
+        echo "🤝 Workspace Service test qilinmoqda...\n";
+        
+        // Get workspace resources
+        $this->runTest('getWorkspaceResources', function() {
+            return $this->service->workspace()->getWorkspaceResources();
+        });
+        
+        // Get workspace members
+        $this->runTest('getWorkspaceMembers', function() {
+            return $this->service->workspace()->getWorkspaceMembers();
+        });
+        
+        echo "\n";
+    }
+
+    private function runTest(string $methodName, callable $testFunction)
+    {
+        try {
+            echo "  🧪 $methodName... ";
+            $result = $testFunction();
+            
+            if (is_array($result) && isset($result['success']) && $result['success']) {
+                echo "✅ Muvaffaqiyatli\n";
+                $this->testResults[$methodName] = ['status' => 'success', 'data' => $result];
+                return $result;
+            } elseif (is_array($result)) {
+                echo "❌ Xatolik: " . ($result['error'] ?? 'Unknown error') . "\n";
+                $this->testResults[$methodName] = ['status' => 'error', 'error' => $result['error'] ?? 'Unknown error'];
+            } else {
+                echo "✅ Tugallandi\n";
+                $this->testResults[$methodName] = ['status' => 'completed', 'data' => $result];
+                return $result;
+            }
+        } catch (Exception $e) {
+            echo "❌ Exception: " . $e->getMessage() . "\n";
+            $this->testResults[$methodName] = ['status' => 'exception', 'error' => $e->getMessage()];
+        }
+        
+        return null;
+    }
+
+    private function printSummary(): void
+    {
+        echo "📋 TEST NATIJALARI SUMMARY:\n";
+        echo str_repeat("=", 50) . "\n";
+        
+        $successCount = 0;
+        $errorCount = 0;
+        $exceptionCount = 0;
+        
+        foreach ($this->testResults as $method => $result) {
+            $status = $result['status'];
+            $icon = match($status) {
+                'success', 'completed' => '✅',
+                'error' => '⚠️',
+                'exception' => '❌',
+                default => '❓'
+            };
+            
+            echo "$icon $method: " . ucfirst($status);
+            
+            if (isset($result['error'])) {
+                echo " - " . $result['error'];
+            }
+            
+            echo "\n";
+            
+            match($status) {
+                'success', 'completed' => $successCount++,
+                'error' => $errorCount++,
+                'exception' => $exceptionCount++,
+                default => null
+            };
+        }
+        
+        echo str_repeat("=", 50) . "\n";
+        echo "📊 JAMI: " . count($this->testResults) . " test\n";
+        echo "✅ Muvaffaqiyatli: $successCount\n";
+        echo "⚠️  Xatolik: $errorCount\n";
+        echo "❌ Exception: $exceptionCount\n";
+        
+        if ($successCount > 0) {
+            echo "\n🎉 Ba'zi testlar muvaffaqiyatli o'tdi!\n";
+            echo "📁 Audio fayllar: {$this->outputDir}/\n";
+        }
+        
+        if ($errorCount > 0 || $exceptionCount > 0) {
+            echo "\n💡 Maslahat: Ba'zi metodlar uchun to'lov rejasi yoki qo'shimcha sozlamalar kerak bo'lishi mumkin.\n";
+        }
+    }
+
+    public function testVoiceCloning(): void
+    {
+        echo "🎭 Voice Cloning alohida test qilinmoqda...\n";
+        
+        // Create sample audio files for voice cloning test
+        $sampleFiles = $this->createSampleAudioFiles();
+        
+        if (!empty($sampleFiles)) {
+            $this->runTest('addVoice (Voice Cloning)', function() use ($sampleFiles) {
+                return $this->service->voice()->addVoice(
+                    'Test Cloned Voice ' . date('H:i:s'),
+                    $sampleFiles,
+                    'Test voice cloning with sample audio files',
+                    ['test' => 'true', 'language' => 'uzbek']
+                );
+            });
+        } else {
+            echo "⚠️  Voice cloning test qilinmadi - sample audio fayllar yaratilmadi\n";
+        }
+    }
+
+    private function createSampleAudioFiles(): array
+    {
+        // For real testing, you would need actual audio files
+        // This is just a placeholder - you need to provide real WAV files
+        $sampleFiles = [];
+        
+        // You can add real audio file paths here:
+        // $sampleFiles[] = '/path/to/your/voice_sample1.wav';
+        // $sampleFiles[] = '/path/to/your/voice_sample2.wav';
+        
+        echo "⚠️  Voice cloning uchun haqiqiy audio fayllar kerak\n";
+        echo "   Sample fayllarni qo'lda qo'shing va qayta ishga tushiring\n";
+        
+        return $sampleFiles;
+    }
+}
+
+// ============================================================================
+// MAIN EXECUTION
+// ============================================================================
+
+if (php_sapi_name() === 'cli') {
+    echo "ElevenLabs API Real Test Script\n";
+    echo "===============================\n";
+    
+    // API KEY ni bu yerga qo'ying
+    $apiKey = 'sk_ce264428783d15a5cd6577a1128b4048ee11164c1fab436b';
+    
+    if ($apiKey === 'YOUR_ELEVENLABS_API_KEY_HERE') {
+        echo "❌ Xatolik: API key ni sozlang!\n";
+        echo "Faylda \$apiKey qatorini o'zgartiring.\n";
+        exit(1);
+    }
+    
+    echo "🔑 API Key uzunligi: " . strlen($apiKey) . " belgi\n\n";
+    
+    $tester = new ElevenLabsRealApiTest($apiKey);
+    
+    // Run all tests
+    $tester->runAllTests();
+    
+    // Uncomment this line to test voice cloning separately
+    // $tester->testVoiceCloning();
+} else {
+    echo "Bu skript faqat CLI dan ishga tushirilishi kerak\n";
+}

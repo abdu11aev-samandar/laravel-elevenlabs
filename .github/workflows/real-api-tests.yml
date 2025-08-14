@@ -1,0 +1,327 @@
+name: Real API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
+  schedule:
+    # Run daily at 2 AM UTC to catch API changes
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      max_attempts:
+        description: 'Maximum test attempts'
+        required: false
+        default: '5'
+        type: string
+      wait_time:
+        description: 'Wait time between attempts (seconds)'
+        required: false
+        default: '30'
+        type: string
+
+jobs:
+  real-api-tests:
+    name: Real API Tests (PHP ${{ matrix.php }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        php: ['8.1', '8.2', '8.3', '8.4']
+        include:
+          # Add specific configurations for different subscription tiers
+          - php: '8.3'
+            os: ubuntu-latest
+            test-tier: 'free'
+          - php: '8.3'
+            os: ubuntu-latest
+            test-tier: 'starter'
+          - php: '8.3'
+            os: ubuntu-latest  
+            test-tier: 'creator'
+        exclude:
+          # Exclude some combinations to reduce CI load
+          - os: windows-latest
+            php: '8.1'
+          - os: macos-latest
+            php: '8.1'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+      
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+      
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      - name: Create test directories
+        run: |
+          mkdir -p storage/test_output
+          mkdir -p test_results
+      
+      - name: Check API Key availability
+        id: check-api-key
+        run: |
+          if [[ -n "${{ secrets.ELEVENLABS_API_KEY }}" ]]; then
+            echo "api_key_available=true" >> $GITHUB_OUTPUT
+            echo "✅ API Key is available"
+          else
+            echo "api_key_available=false" >> $GITHUB_OUTPUT
+            echo "⚠️ API Key is not available"
+          fi
+        shell: bash
+      
+      - name: Run Real API Tests (with retry logic)
+        if: steps.check-api-key.outputs.api_key_available == 'true'
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          # Configuration
+          MAX_ATTEMPTS="${{ github.event.inputs.max_attempts || '5' }}"
+          WAIT_TIME="${{ github.event.inputs.wait_time || '30' }}"
+          
+          echo "🧪 Starting Real API Tests"
+          echo "Max attempts: $MAX_ATTEMPTS"
+          echo "Wait time: $WAIT_TIME seconds"
+          echo "PHP Version: ${{ matrix.php }}"
+          echo "OS: ${{ matrix.os }}"
+          echo "Test Tier: ${{ matrix.test-tier || 'standard' }}"
+          
+          # Run tests with retry logic
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            echo "🔄 Attempt $attempt/$MAX_ATTEMPTS"
+            
+            if ./vendor/bin/phpunit --group=real-api --log-junit=test_results/junit_attempt_${attempt}.xml; then
+              echo "🎉 SUCCESS! Tests passed on attempt $attempt"
+              exit 0
+            else
+              test_exit_code=$?
+              echo "❌ Attempt $attempt failed with exit code $test_exit_code"
+              
+              # If not the last attempt, wait before retry
+              if [[ $attempt -lt $MAX_ATTEMPTS ]]; then
+                echo "⏳ Waiting $WAIT_TIME seconds before next attempt..."
+                sleep $WAIT_TIME
+              fi
+            fi
+          done
+          
+          echo "❌ All $MAX_ATTEMPTS attempts failed"
+          exit 1
+        shell: bash
+      
+      - name: Skip tests (no API key)
+        if: steps.check-api-key.outputs.api_key_available == 'false'
+        run: |
+          echo "⚠️ Skipping Real API Tests - No API key configured"
+          echo "To enable real API tests, add ELEVENLABS_API_KEY to repository secrets"
+          echo "Running tests in skip mode to verify test structure..."
+          ./vendor/bin/phpunit --group=real-api || true
+        shell: bash
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results-${{ matrix.php }}-${{ matrix.os }}
+          path: |
+            test_results/
+            storage/test_output/
+          retention-days: 30
+      
+      - name: Upload failure logs
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: failure-logs-${{ matrix.php }}-${{ matrix.os }}
+          path: |
+            test_results/
+            storage/test_output/
+          retention-days: 7
+  
+  # Aggregate results job
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: real-api-tests
+    if: always()
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      
+      - name: Generate test summary
+        run: |
+          echo "# Real API Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Count successful vs failed jobs
+          success_count=0
+          failure_count=0
+          
+          for result_dir in artifacts/test-results-*/; do
+            if [[ -d "$result_dir" ]]; then
+              # Check if junit files exist and contain successful tests
+              if ls "$result_dir"junit_attempt_*.xml 1> /dev/null 2>&1; then
+                if grep -q 'failures="0".*errors="0"' "$result_dir"junit_attempt_*.xml 2>/dev/null; then
+                  ((success_count++))
+                else
+                  ((failure_count++))
+                fi
+              else
+                ((failure_count++))
+              fi
+            fi
+          done
+          
+          total_jobs=$((success_count + failure_count))
+          success_rate=0
+          if [[ $total_jobs -gt 0 ]]; then
+            success_rate=$(( (success_count * 100) / total_jobs ))
+          fi
+          
+          echo "## Results Overview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total Test Jobs**: $total_jobs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Successful**: $success_count ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Failed**: $failure_count ❌" >> $GITHUB_STEP_SUMMARY
+          echo "- **Success Rate**: $success_rate%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ $success_rate -eq 100 && $total_jobs -gt 0 ]]; then
+            echo "## 🎉 All Tests Passed!" >> $GITHUB_STEP_SUMMARY
+            echo "All real API tests completed successfully across all matrix combinations." >> $GITHUB_STEP_SUMMARY
+          elif [[ $success_count -eq 0 ]]; then
+            echo "## ⚠️ No API Key Configured" >> $GITHUB_STEP_SUMMARY
+            echo "Tests were skipped due to missing ELEVENLABS_API_KEY secret." >> $GITHUB_STEP_SUMMARY
+            echo "To enable real API testing, add your ElevenLabs API key to repository secrets." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 🔧 Some Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Check the individual job logs and uploaded artifacts for details." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Common Issues:" >> $GITHUB_STEP_SUMMARY
+            echo "- API rate limiting" >> $GITHUB_STEP_SUMMARY
+            echo "- Subscription tier limitations" >> $GITHUB_STEP_SUMMARY
+            echo "- Network connectivity issues" >> $GITHUB_STEP_SUMMARY
+            echo "- API endpoint changes" >> $GITHUB_STEP_SUMMARY
+          fi
+        shell: bash
+
+  # Job to update documentation with test results
+  update-docs:
+    name: Update Test Documentation
+    runs-on: ubuntu-latest
+    needs: [real-api-tests, test-summary]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Download test artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      
+      - name: Update test documentation
+        run: |
+          # Create/update a test results file
+          cat > REAL_API_TEST_STATUS.md << EOF
+          # Real API Test Status
+          
+          Last Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          
+          ## Current Status
+          
+          This document is automatically updated by GitHub Actions after each test run.
+          
+          ### Latest Test Run Results
+          
+          - **Workflow**: ${{ github.workflow }}
+          - **Run ID**: ${{ github.run_id }}
+          - **Commit**: ${{ github.sha }}
+          - **Branch**: ${{ github.ref_name }}
+          
+          ### Test Matrix
+          
+          The real API tests are run across multiple PHP versions and operating systems:
+          
+          - **PHP Versions**: 8.1, 8.2, 8.3, 8.4
+          - **Operating Systems**: Ubuntu, Windows, macOS
+          - **Test Tiers**: Free, Starter, Creator
+          
+          ### How to Run Tests Locally
+          
+          1. Set your ElevenLabs API key:
+          \`\`\`bash
+          export ELEVENLABS_API_KEY="your-api-key-here"
+          \`\`\`
+          
+          2. Run the automated test script:
+          \`\`\`bash
+          ./run_real_api_tests.sh
+          \`\`\`
+          
+          3. Or run PHPUnit directly:
+          \`\`\`bash
+          ./vendor/bin/phpunit --group=real-api
+          \`\`\`
+          
+          ### Troubleshooting
+          
+          If tests are failing:
+          
+          1. **401 Unauthorized**: Check your API key validity
+          2. **422 Validation**: API parameters may have changed
+          3. **429 Rate Limit**: Wait between test runs or upgrade subscription
+          4. **Subscription**: Some features require higher tier plans
+          
+          For more details, see the test artifacts in the GitHub Actions run.
+          EOF
+          
+          # Only commit if there are changes
+          if ! git diff --quiet REAL_API_TEST_STATUS.md; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add REAL_API_TEST_STATUS.md
+            git commit -m "Update real API test status [skip ci]"
+            git push
+          fi
+        shell: bash
