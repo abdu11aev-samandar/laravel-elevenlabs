@@ -6,17 +6,60 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="ElevenLabs Test Suite">
-            <directory suffix="Test.php">./tests</directory>
+        <testsuite name="Unit Tests">
+            <directory suffix="Test.php">./tests/Unit</directory>
+            <exclude>./tests/Unit/ServiceTestsComprehensive</exclude>
+        </testsuite>
+        <testsuite name="Feature Tests">
+            <directory suffix="Test.php">./tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration Tests">
+            <directory suffix="Test.php">./tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Real API Tests">
+            <directory suffix="Test.php">./tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Comprehensive Coverage Tests">
+            <directory suffix="Test.php">./tests/Unit/ServiceTestsComprehensive</directory>
         </testsuite>
     </testsuites>
-    <coverage>
+    <groups>
         <include>
-            <directory suffix=".php">./src</directory>
+            <group>analytics</group>
+            <group>voice</group>
+            <group>audio</group>
+            <group>ai</group>
+            <group>studio</group>
+            <group>workspace</group>
+            <group>integration</group>
+            <group>safe</group>
+            <group>real-api</group>
+            <group>comprehensive-coverage</group>
+            <group>unit</group>
         </include>
+        <exclude>
+            <group>destructive</group>
+        </exclude>
+    </groups>
+    <coverage>
+        <report>
+            <clover outputFile="coverage/clover.xml"/>
+            <html outputDirectory="coverage/html"/>
+            <text outputFile="coverage/coverage.txt"/>
+        </report>
+        <include>
+            <directory suffix=".php">./src/Services</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">./src/Services/Core</directory>
+            <file>./src/ElevenLabsServiceProvider.php</file>
+            <file>./src/Facades/ElevenLabs.php</file>
+        </exclude>
     </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="ELEVENLABS_API_KEY" value="test-key"/>
+        <server name="DB_CONNECTION" value="sqlite"/>
+        <server name="DB_DATABASE" value=":memory:"/>
     </php>
 </phpunit>

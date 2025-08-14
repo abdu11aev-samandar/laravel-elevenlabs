@@ -53,7 +53,7 @@ class AudioServiceNewEndpointsTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/audio-native', Mockery::on(function ($options) {
+            ->with('audio-native', Mockery::on(function ($options) {
                 return isset($options['multipart']) && 
                        is_array($options['multipart']) &&
                        count($options['multipart']) === 1;
@@ -82,7 +82,7 @@ class AudioServiceNewEndpointsTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/audio-native', Mockery::on(function ($options) {
+            ->with('audio-native', Mockery::on(function ($options) {
                 return isset($options['multipart']) && 
                        is_array($options['multipart']);
             }))
@@ -133,7 +133,7 @@ class AudioServiceNewEndpointsTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/sound-generation', Mockery::on(function ($options) use ($text) {
+            ->with('sound-generation', Mockery::on(function ($options) use ($text) {
                 return isset($options['json']) && 
                        $options['json']['text'] === $text;
             }))
@@ -158,7 +158,7 @@ class AudioServiceNewEndpointsTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/sound-generation', Mockery::on(function ($options) use ($text, $durationSeconds, $promptInfluence) {
+            ->with('sound-generation', Mockery::on(function ($options) use ($text, $durationSeconds, $promptInfluence) {
                 $json = $options['json'];
                 return $json['text'] === $text && 
                        $json['duration_seconds'] === $durationSeconds &&
@@ -184,7 +184,7 @@ class AudioServiceNewEndpointsTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/sound-generation', Mockery::on(function ($options) use ($text, $durationSeconds) {
+            ->with('sound-generation', Mockery::on(function ($options) use ($text, $durationSeconds) {
                 $json = $options['json'];
                 return $json['text'] === $text && 
                        $json['duration_seconds'] === $durationSeconds &&
@@ -225,7 +225,7 @@ class AudioServiceNewEndpointsTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/sound-generation', Mockery::on(function ($options) use ($text, $promptInfluence) {
+            ->with('sound-generation', Mockery::on(function ($options) use ($text, $promptInfluence) {
                 $json = $options['json'];
                 return $json['text'] === $text && 
                        $json['prompt_influence'] === $promptInfluence &&

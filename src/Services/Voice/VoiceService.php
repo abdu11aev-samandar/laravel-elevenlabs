@@ -12,7 +12,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function getVoices(): array
     {
-        $result = $this->get('/voices');
+        $result = $this->get('voices');
 
         if ($result['success']) {
             return [
@@ -29,7 +29,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function getVoice(string $voiceId): array
     {
-        $result = $this->get("/voices/{$voiceId}");
+        $result = $this->get("voices/{$voiceId}");
 
         if ($result['success']) {
             return [
@@ -71,7 +71,7 @@ class VoiceService extends BaseElevenLabsService
             }
         }
 
-        $result = $this->post('/voices/add', [
+        $result = $this->post('voices/add', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -91,7 +91,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function editVoiceSettings(string $voiceId, array $voiceSettings): array
     {
-        return $this->post("/voices/{$voiceId}/settings/edit", [
+        return $this->post("voices/{$voiceId}/settings/edit", [
             'json' => $voiceSettings
         ]);
     }
@@ -101,7 +101,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function deleteVoice(string $voiceId): array
     {
-        return $this->delete("/voices/{$voiceId}");
+        return $this->delete("voices/{$voiceId}");
     }
 
     /**
@@ -125,7 +125,7 @@ class VoiceService extends BaseElevenLabsService
             ];
         }
 
-        $result = $this->post('/similar-voices', [
+        $result = $this->post('similar-voices', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -145,7 +145,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function getSharedVoices(): array
     {
-        $result = $this->get('/shared-voices');
+        $result = $this->get('shared-voices');
 
         if ($result['success']) {
             return [
@@ -162,7 +162,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function getPronunciationDictionaries(): array
     {
-        $result = $this->get('/pronunciation-dictionaries');
+        $result = $this->get('pronunciation-dictionaries');
 
         if ($result['success']) {
             return [
@@ -179,7 +179,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function addPronunciationDictionary(string $name, array $rules, string $description = ''): array
     {
-        $result = $this->post('/pronunciation-dictionaries/add', [
+        $result = $this->post('pronunciation-dictionaries/add', [
             'json' => [
                 'name' => $name,
                 'rules' => $rules,
@@ -202,7 +202,7 @@ class VoiceService extends BaseElevenLabsService
      */
     public function createVoicePreviews(string $text, string $voiceId): array
     {
-        $result = $this->post('/text-to-voice/create-previews', [
+        $result = $this->post('text-to-voice/create-previews', [
             'json' => [
                 'text' => $text,
                 'voice_id' => $voiceId,

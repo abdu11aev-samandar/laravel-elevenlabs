@@ -50,7 +50,7 @@ class AudioService extends BaseElevenLabsService
             }
         }
 
-        $result = $this->post('/audio-native', [
+        $result = $this->post('audio-native', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -71,7 +71,7 @@ class AudioService extends BaseElevenLabsService
      */
     public function getAudioNativeSettings(string $projectId): array
     {
-        $result = $this->get("/audio-native/{$projectId}/settings");
+        $result = $this->get("audio-native/{$projectId}/settings");
 
         if ($result['success']) {
             return [
@@ -90,7 +90,7 @@ class AudioService extends BaseElevenLabsService
         string $voiceId = '21m00Tcm4TlvDq8ikWAM', 
         array $voiceSettings = []
     ): array {
-        $defaultVoiceSettings = config('elevenlabs.default_voice_settings', [
+        $defaultVoiceSettings = $this->getConfig('elevenlabs.default_voice_settings', [
             'stability' => 0.5,
             'similarity_boost' => 0.5,
             'style' => 0.5,
@@ -99,9 +99,9 @@ class AudioService extends BaseElevenLabsService
 
         $voiceSettings = array_merge($defaultVoiceSettings, $voiceSettings);
 
-        $modelId = config('elevenlabs.default_model', 'eleven_multilingual_v2');
+        $modelId = $this->getConfig('elevenlabs.default_model', 'eleven_multilingual_v2');
 
-        $result = $this->postBinary("/text-to-speech/{$voiceId}", [
+        $result = $this->postBinary("text-to-speech/{$voiceId}", [
             'json' => [
                 'text' => $text,
                 'model_id' => $modelId,
@@ -146,7 +146,7 @@ class AudioService extends BaseElevenLabsService
             'contents' => $modelId
         ];
 
-        $result = $this->post('/speech-to-text', [
+        $result = $this->post('speech-to-text', [
             'multipart' => $multipart,
             'headers' => [
                 'xi-api-key' => $this->apiKey,
@@ -194,7 +194,7 @@ class AudioService extends BaseElevenLabsService
             ];
         }
 
-        $result = $this->postBinary("/speech-to-speech/{$voiceId}", [
+        $result = $this->postBinary("speech-to-speech/{$voiceId}", [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -219,7 +219,7 @@ class AudioService extends BaseElevenLabsService
         string $modelId = null,
         array $voiceSettings = []
     ): \Generator {
-        $defaultVoiceSettings = config('elevenlabs.default_voice_settings', [
+        $defaultVoiceSettings = $this->getConfig('elevenlabs.default_voice_settings', [
             'stability' => 0.5,
             'similarity_boost' => 0.5,
             'style' => 0.5,
@@ -228,10 +228,10 @@ class AudioService extends BaseElevenLabsService
 
         $voiceSettings = array_merge($defaultVoiceSettings, $voiceSettings);
 
-        $effectiveModelId = $modelId ?? config('elevenlabs.default_model', 'eleven_multilingual_v2');
+        $effectiveModelId = $modelId ?? $this->getConfig('elevenlabs.default_model', 'eleven_multilingual_v2');
 
         try {
-            $response = $this->client->post("/text-to-speech/{$voiceId}/stream", [
+            $response = $this->client->post("text-to-speech/{$voiceId}/stream", [
                 'json' => [
                     'text' => $text,
                     'model_id' => $effectiveModelId,
@@ -245,7 +245,7 @@ class AudioService extends BaseElevenLabsService
                 yield $body->read(1024);
             }
         } catch (\Exception $e) {
-            Log::error('ElevenLabs Stream TTS Error: ' . $e->getMessage());
+            $this->logError('ElevenLabs Stream TTS Error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -264,7 +264,7 @@ class AudioService extends BaseElevenLabsService
             file_put_contents($filePath, $audioContent);
             return true;
         } catch (\Exception $e) {
-            Log::error('ElevenLabs Save Audio Error: ' . $e->getMessage());
+            $this->logError('ElevenLabs Save Audio Error: ' . $e->getMessage());
             return false;
         }
     }
@@ -313,7 +313,7 @@ class AudioService extends BaseElevenLabsService
             ];
         }
 
-        $result = $this->post('/forced-alignment', [
+        $result = $this->post('forced-alignment', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -349,7 +349,7 @@ class AudioService extends BaseElevenLabsService
             ];
         }
 
-        $result = $this->postBinary('/audio-native', ['multipart' => $multipart]);
+        $result = $this->postBinary('audio-native', ['multipart' => $multipart]);
 
         if ($result['success']) {
             return [
@@ -380,7 +380,7 @@ class AudioService extends BaseElevenLabsService
             $data['prompt_influence'] = $promptInfluence;
         }
 
-        $result = $this->postBinary('/sound-generation', ['json' => $data]);
+        $result = $this->postBinary('sound-generation', ['json' => $data]);
 
         if ($result['success']) {
             return [

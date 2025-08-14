@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         cacheResult="false"
+         forceCoversAnnotation="true"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutUnintentionallyCoveringCode="true"
+         testdox="true">
+    <testsuites>
+        <testsuite name="Comprehensive Coverage Tests">
+            <directory suffix="Test.php">./tests/Unit/ServiceTestsComprehensive</directory>
+        </testsuite>
+    </testsuites>
+    
+    <groups>
+        <include>
+            <group>comprehensive-coverage</group>
+        </include>
+    </groups>
+    
+    <coverage processUncoveredFiles="true">
+        <report>
+            <clover outputFile="coverage/comprehensive/clover.xml"/>
+            <html outputDirectory="coverage/comprehensive/html"/>
+            <text outputFile="coverage/comprehensive/coverage.txt"/>
+            <crap4j outputFile="coverage/comprehensive/crap4j.xml"/>
+            <xml outputDirectory="coverage/comprehensive/xml"/>
+        </report>
+        <include>
+            <directory suffix=".php">./src/Services</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">./src/Services/Core</directory>
+            <file>./src/ElevenLabsServiceProvider.php</file>
+            <file>./src/Facades/ElevenLabs.php</file>
+            <file>./src/Services/Base/BaseService.php</file>
+        </exclude>
+    </coverage>
+    
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="ELEVENLABS_API_KEY" value="test-comprehensive-key"/>
+        <server name="DB_CONNECTION" value="sqlite"/>
+        <server name="DB_DATABASE" value=":memory:"/>
+        <ini name="memory_limit" value="512M"/>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="log_errors_max_len" value="0"/>
+        <ini name="zend.assertions" value="1"/>
+        <ini name="assert.exception" value="1"/>
+        <ini name="xdebug.show_exception_trace" value="0"/>
+    </php>
+    
+    <logging>
+        <junit outputFile="coverage/comprehensive/junit.xml"/>
+    </logging>
+</phpunit>

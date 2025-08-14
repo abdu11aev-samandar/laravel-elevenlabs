@@ -12,7 +12,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getChapter(string $projectId, string $chapterId): array
     {
-        $result = $this->get("/studio/projects/{$projectId}/chapters/{$chapterId}");
+        $result = $this->get("studio/projects/{$projectId}/chapters/{$chapterId}");
 
         if ($result['success']) {
             return [
@@ -29,7 +29,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function listChapterSnapshots(string $projectId, string $chapterId): array
     {
-        $result = $this->get("/studio/projects/{$projectId}/chapters/{$chapterId}/snapshots");
+        $result = $this->get("studio/projects/{$projectId}/chapters/{$chapterId}/snapshots");
 
         if ($result['success']) {
             return [
@@ -46,7 +46,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getChapterSnapshot(string $projectId, string $chapterId, string $chapterSnapshotId): array
     {
-        $result = $this->get("/studio/projects/{$projectId}/chapters/{$chapterId}/snapshots/{$chapterSnapshotId}");
+        $result = $this->get("studio/projects/{$projectId}/chapters/{$chapterId}/snapshots/{$chapterSnapshotId}");
 
         if ($result['success']) {
             return [
@@ -63,7 +63,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getProjectSnapshot(string $projectId, string $projectSnapshotId): array
     {
-        $result = $this->get("/studio/projects/{$projectId}/snapshots/{$projectSnapshotId}");
+        $result = $this->get("studio/projects/{$projectId}/snapshots/{$projectSnapshotId}");
 
         if ($result['success']) {
             return [
@@ -79,7 +79,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getStudioProjects(): array
     {
-        $result = $this->get('/studio/projects');
+        $result = $this->get('studio/projects');
 
         if ($result['success']) {
             return [
@@ -116,7 +116,7 @@ class StudioService extends BaseElevenLabsService
             ];
         }
 
-        $result = $this->post('/studio/projects', [
+        $result = $this->post('studio/projects', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -136,7 +136,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getStudioProject(string $projectId): array
     {
-        $result = $this->get("/studio/projects/{$projectId}");
+        $result = $this->get("studio/projects/{$projectId}");
 
         if ($result['success']) {
             return [
@@ -153,7 +153,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function deleteStudioProject(string $projectId): array
     {
-        return $this->delete("/studio/projects/{$projectId}");
+        return $this->delete("studio/projects/{$projectId}");
     }
 
     /**
@@ -161,7 +161,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function convertStudioProject(string $projectId): array
     {
-        $result = $this->post("/studio/projects/{$projectId}/convert");
+        $result = $this->post("studio/projects/{$projectId}/convert");
 
         if ($result['success']) {
             return [
@@ -178,7 +178,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function createPodcastProject(array $podcastData): array
     {
-        $result = $this->post('/studio/podcasts', [
+        $result = $this->post('studio/podcasts', [
             'json' => $podcastData
         ]);
 
@@ -229,7 +229,7 @@ class StudioService extends BaseElevenLabsService
             ];
         }
 
-        $result = $this->post('/dubbing', [
+        $result = $this->post('dubbing', [
             'multipart' => $multipart,
             'headers' => ['xi-api-key' => $this->apiKey]
         ]);
@@ -249,7 +249,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getDubbing(string $dubbingId): array
     {
-        $result = $this->get("/dubbing/{$dubbingId}");
+        $result = $this->get("dubbing/{$dubbingId}");
 
         if ($result['success']) {
             return [
@@ -266,7 +266,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getDubbedAudio(string $dubbingId, string $languageCode): array
     {
-        $result = $this->postBinary("/dubbing/{$dubbingId}/audio/{$languageCode}");
+        $result = $this->postBinary("dubbing/{$dubbingId}/audio/{$languageCode}");
 
         if ($result['success']) {
             return [
@@ -284,7 +284,7 @@ class StudioService extends BaseElevenLabsService
      */
     public function getDubbingTranscript(string $dubbingId, string $formatType = 'srt'): array
     {
-        $endpoint = "/dubbing/{$dubbingId}/transcript?" . http_build_query(['format_type' => $formatType]);
+        $endpoint = "dubbing/{$dubbingId}/transcript?" . http_build_query(['format_type' => $formatType]);
         $result = $this->get($endpoint);
 
         if ($result['success']) {

@@ -11,7 +11,7 @@ class AnalyticsService extends BaseElevenLabsService
      */
     public function getUserInfo(): array
     {
-        $result = $this->get('/user');
+        $result = $this->get('user');
 
         if ($result['success']) {
             return [
@@ -28,7 +28,7 @@ class AnalyticsService extends BaseElevenLabsService
      */
     public function getUserSubscription(): array
     {
-        $result = $this->get('/user/subscription');
+        $result = $this->get('user/subscription');
 
         if ($result['success']) {
             return [
@@ -45,7 +45,7 @@ class AnalyticsService extends BaseElevenLabsService
      */
     public function getModels(): array
     {
-        $result = $this->get('/models');
+        $result = $this->get('models');
 
         if ($result['success']) {
             return [
@@ -60,14 +60,29 @@ class AnalyticsService extends BaseElevenLabsService
     /**
      * Get character usage statistics
      */
-    public function getCharacterUsage(): array
+    public function getCharacterUsage(?int $startUnix = null, ?int $endUnix = null): array
     {
-        $result = $this->get('/usage/character-stats');
+        // If no start time provided, default to 30 days ago
+        if ($startUnix === null) {
+            $startUnix = time() - (30 * 24 * 60 * 60); // 30 days ago
+        }
+        
+        // If no end time provided, default to now
+        if ($endUnix === null) {
+            $endUnix = time();
+        }
+        
+        $params = [
+            'start_unix' => $startUnix,
+            'end_unix' => $endUnix,
+        ];
+        
+        $result = $this->get('usage/character-stats?' . http_build_query($params));
 
         if ($result['success']) {
             return [
                 'success' => true,
-                'usage' => $result['data'],
+                'history' => $result['data'],
             ];
         }
 
@@ -84,7 +99,7 @@ class AnalyticsService extends BaseElevenLabsService
             $params['start_after_history_item_id'] = $startAfterHistoryItemId;
         }
 
-        $result = $this->get('/history?' . http_build_query($params));
+        $result = $this->get('history?' . http_build_query($params));
 
         if ($result['success']) {
             return [
@@ -101,7 +116,7 @@ class AnalyticsService extends BaseElevenLabsService
      */
     public function getHistoryItem(string $historyItemId): array
     {
-        $result = $this->get("/history/{$historyItemId}");
+        $result = $this->get("history/{$historyItemId}");
 
         if ($result['success']) {
             return [
@@ -118,7 +133,7 @@ class AnalyticsService extends BaseElevenLabsService
      */
     public function deleteHistoryItem(string $historyItemId): array
     {
-        return $this->delete("/history/{$historyItemId}");
+        return $this->delete("history/{$historyItemId}");
     }
 
     /**
@@ -126,7 +141,7 @@ class AnalyticsService extends BaseElevenLabsService
      */
     public function downloadHistory(array $historyItemIds): array
     {
-        $result = $this->postBinary('/history/download', [
+        $result = $this->postBinary('history/download', [
             'json' => ['history_item_ids' => $historyItemIds]
         ]);
 
@@ -154,7 +169,7 @@ class AnalyticsService extends BaseElevenLabsService
                 'success' => true,
                 'summary' => [
                     'user' => $userInfo['user'],
-                    'usage' => $characterUsage['usage'],
+                    'history' => $characterUsage['history'],
                     'generated_at' => date('c'), // ISO 8601 format
                 ]
             ];

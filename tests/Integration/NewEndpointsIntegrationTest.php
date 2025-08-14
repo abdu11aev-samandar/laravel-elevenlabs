@@ -76,7 +76,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/audio-native', Mockery::any())
+            ->with('audio-native', Mockery::any())
             ->andReturn($isolationResponse);
 
         // Step 2: Sound Generation
@@ -85,7 +85,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/sound-generation', Mockery::any())
+            ->with('sound-generation', Mockery::any())
             ->andReturn($soundGenResponse);
 
         // Execute workflow
@@ -112,7 +112,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/user/subscription')
+            ->with('user/subscription')
             ->andReturn($subscriptionResponse);
 
         // Step 2: Create an AI agent
@@ -126,7 +126,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/convai/agents/create', Mockery::any())
+            ->with('convai/agents/create', Mockery::any())
             ->andReturn($agentResponse);
 
         // Step 3: Get conversations with filtering
@@ -143,7 +143,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with(Mockery::pattern('/\/convai\/conversations\?/'))
+            ->with(Mockery::pattern('/convai\/conversations\?/'))
             ->andReturn($conversationsResponse);
 
         // Step 4: Get specific conversation details
@@ -158,7 +158,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/conversations/conv-1')
+            ->with('convai/conversations/conv-1')
             ->andReturn($conversationResponse);
 
         // Step 5: Download conversation audio
@@ -167,7 +167,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/conversations/conv-1/audio')
+            ->with('convai/conversations/conv-1/audio')
             ->andReturn($audioResponse);
 
         // Execute complete workflow
@@ -206,7 +206,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/convai/batch-calling/submit', Mockery::any())
+            ->with('convai/batch-calling/submit', Mockery::any())
             ->andReturn($batchSubmitResponse);
 
         // Step 2: Check batch status
@@ -222,7 +222,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/batch-calling/batch-456')
+            ->with('convai/batch-calling/batch-456')
             ->andReturn($statusResponse);
 
         // Execute batch workflow
@@ -255,7 +255,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/user/subscription')
+            ->with('user/subscription')
             ->andReturn($subscriptionResponse);
 
         // Step 2: Create voice previews
@@ -279,7 +279,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/text-to-voice/create-previews', Mockery::any())
+            ->with('text-to-voice/create-previews', Mockery::any())
             ->andReturn($previewResponse);
 
         // Execute voice preview workflow
@@ -309,7 +309,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/audio-native', Mockery::any())
+            ->with('audio-native', Mockery::any())
             ->andThrow(new \GuzzleHttp\Exception\RequestException(
                 'Audio processing failed', 
                 Mockery::mock('Psr\Http\Message\RequestInterface')
@@ -323,7 +323,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/text-to-voice/create-previews', Mockery::any())
+            ->with('text-to-voice/create-previews', Mockery::any())
             ->andThrow(new \GuzzleHttp\Exception\RequestException(
                 'Voice not found', 
                 Mockery::mock('Psr\Http\Message\RequestInterface')
@@ -337,7 +337,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/conversations/invalid-id')
+            ->with('convai/conversations/invalid-id')
             ->andThrow(new \GuzzleHttp\Exception\RequestException(
                 'Conversation not found', 
                 Mockery::mock('Psr\Http\Message\RequestInterface')
@@ -360,7 +360,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('post')
             ->once()
-            ->with('/convai/agents/create', Mockery::any())
+            ->with('convai/agents/create', Mockery::any())
             ->andReturn($agentResponse);
 
         // Test enhanced agent creation
@@ -375,7 +375,7 @@ class NewEndpointsIntegrationTest extends TestCase
         $this->mockClient
             ->shouldReceive('get')
             ->once()
-            ->with('/convai/agents/agent-123/conversations')
+            ->with('convai/agents/agent-123/conversations')
             ->andReturn($conversationsResponse);
 
         $conversations = $this->service->ai()->getAgentConversations('agent-123');
