@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-01-14
+
 ### Added
 - New endpoints for AI service: signed-url, widget, knowledge base docs, RAG, tools, MCP, and dashboard endpoints.
 - New endpoints for audio service: createAudioNativeProject and getAudioNativeSettings.
@@ -26,4 +28,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed conversation audio GET in tests.
 
+## [1.1.0] - 2025-01-13
+### Added
+- Tests for AIService extra endpoints and WorkspaceService
+- Extended README examples
+- Added Studio chapters/snapshots tests
+
+### Fixed
+- Fixed conversation audio GET in tests
+
+## [1.0.0] - 2025-01-13
+### Added
+- Initial release with comprehensive ElevenLabs API support
+- All major service endpoints (Voice, Audio, AI, Studio, Analytics, Workspace)
+- Laravel service provider and facade
+- Basic testing framework
+
+[Unreleased]: https://github.com/abdu11aev-samandar/laravel-elevenlabs/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/abdu11aev-samandar/laravel-elevenlabs/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/abdu11aev-samandar/laravel-elevenlabs/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/abdu11aev-samandar/laravel-elevenlabs/releases/tag/v1.0.0
 
